@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,130 +9,104 @@ import { Container } from './container';
 import { usePathname } from 'next/navigation';
 import { ModalAutch } from './modalAutch';
 import { signOut, useSession } from 'next-auth/react';
-import { ImExit } from "react-icons/im";
-import { GrBasket } from "react-icons/gr";
-import { RiUserSettingsFill } from "react-icons/ri";
+import { ImExit } from 'react-icons/im';
+import { GrBasket } from 'react-icons/gr';
+import { RiUserSettingsFill } from 'react-icons/ri';
 import { Loader } from './loader';
-import { SiBurgerking } from "react-icons/si";
+import { SiBurgerking } from 'react-icons/si';
 
 interface Props {
     className?: string;
 } 
 
 const nav = [
-    {
-        title: 'Главная',
-        href: '/'
-    },
-    {
-        title: 'О нас',
-        href: '/about'
-    },
-    {
-        title: 'Товары',
-        href: '/products'
-    },
-    {
-        title: 'Контакты',
-        href: '/contact'
-    }
-]
+    { title: 'Главная', href: '/' },
+    { title: 'О нас', href: '/about' },
+    { title: 'Товары', href: '/products' },
+    { title: 'Контакты', href: '/contact' },
+];
 
 export const Header: React.FC<Props> = ({ className }) => {
-
     const session = useSession();
-
     const pathname = usePathname();
-
     const [open, setOpen] = useState(false);
+    const [burger, setBurger] = useState(false);
 
-    const [burder, setBurger] = useState(false);
-
-    const handeExit = () => {
-        const promt = window.confirm('Вы действительно хотите выйти?');
-
-        if(!promt) return;
-
-        signOut({ callbackUrl: '/' });
-    }
+    const handleExit = () => {
+        if (window.confirm('Вы действительно хотите выйти?')) {
+            signOut({ callbackUrl: '/' });
+        }
+    };
 
     const handleClickBurger = () => {
-        setBurger(!burder);
+        setBurger(!burger);
+        document.body.style.overflow = burger ? 'auto' : 'hidden';
+    };
 
-        if(burder) {
-            document.body.style.overflow = 'auto';
-        } else {
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    if(session.status === 'loading') return <Loader />;
+    if (session.status === 'loading') return <Loader />;
 
     return (
-        <header className={cn('py-2 px-5 border-b-[2px]', className)}>
+        <header className={cn('py-4 px-5 border-b-2 bg-white shadow-md', className)}>
             <Container className='flex justify-between items-center'>
-
-                <Link href="/">
-                    <Image src="/logo.png" alt="logo" width={70} height={70} />
+                <Link href='/'>
+                    <Image src='/logo.png' alt='logo' width={140} height={140} className='transition-transform duration-500 ease-in-out hover:rotate-6' />
                 </Link>
 
-                <nav>
-                    <ul className='hidden items-center gap-10 md:flex'>
-                        {nav.map(item => (
-                            <li key={item.title}>
-                                <Link 
-                                    href={item.href} 
-                                    className={cn('text-lg text-[#000] font-medium transition-all ease-in-out duration-300 hover:text-[#0080ff]', pathname === item.href && 'text-[#0080ff]')}>
-                                    {item.title}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                <nav className='hidden md:flex gap-8'>
+                    {nav.map((item) => (
+                        <Link
+                            key={item.title}
+                            href={item.href}
+                            className={cn('text-lg font-medium transition-colors duration-300 hover:text-blue-600', pathname === item.href && 'text-blue-600')}
+                        >
+                            {item.title}
+                        </Link>
+                    ))}
                 </nav>
 
-               <div className='flex items-center gap-3'>
-                {!session.data ?
-                        <Button 
-                        className='bg-[#0080ff] transition-all ease-in-out duration-300 hover:bg-[#0080ff]/90'
-                        onClick={() => setOpen(true)}
-                        >
-                        Вход
-                        </Button> :
+                <div className='flex items-center gap-4'>
+                    {!session.data ? (
+                        <Button className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>
+                            Вход
+                        </Button>
+                    ) : (
                         <div className='flex items-center gap-3'>
-                            {session?.data?.user.role === 'admin' &&
-                                <Link href='/admin' className='bg-[#fea724] p-2 rounded-sm transition-all duration-300 hover:bg-[#ffb443]'><RiUserSettingsFill size={20} className='text-[#000000]' /></Link>
-                            }
-                            <Link href='/basket' className='bg-[#eaeef2] p-2 rounded-sm transition-all duration-300 hover:bg-[#dfe4e8]'><GrBasket size={20} /></Link>
-                            <Button 
-                                className='bg-[#e03e3e] hover:bg-[#f15a5a]' 
-                                onClick={handeExit}>
+                            {session.data.user.role === 'admin' && (
+                                <Link href='/admin' className='bg-yellow-500 p-2 rounded hover:bg-yellow-400'>
+                                    <RiUserSettingsFill size={22} className='text-black' />
+                                </Link>
+                            )}
+                            <Link href='/basket' className='bg-gray-200 p-2 rounded hover:bg-gray-300'>
+                                <GrBasket size={22} />
+                            </Link>
+                            <Button className='bg-red-600 hover:bg-red-500' onClick={handleExit}>
                                 <ImExit />
                             </Button>
                         </div>
-                    }
+                    )}
 
-                    <Button onClick={handleClickBurger} className='md:hidden relative z-50'><SiBurgerking /></Button>
-               </div>
-
-
+                    <Button onClick={handleClickBurger} className='md:hidden p-2 bg-gray-100 rounded hover:bg-gray-200'>
+                        <SiBurgerking size={22} />
+                    </Button>
+                </div>
             </Container>
 
-
-           {burder && <div className='fixed top-0 left-0 w-full h-full bg-white z-[10]'>
-                <nav>
-                    <ul className='flex flex-col items-center justify-center h-[100vh] gap-5'>
-                            {nav.map(item => (
-                                <li key={item.title}>
-                                    <Link 
-                                        href={item.href} 
-                                        className={cn('text-lg text-[#000] font-medium transition-all ease-in-out duration-300 hover:text-[#0080ff]', pathname === item.href && 'text-[#0080ff]')}>
-                                        {item.title}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                </nav> 
-            </div>}
+            {burger && (
+                <div className='fixed inset-0 bg-white z-50 flex flex-col items-center justify-center gap-6 shadow-lg'>
+                    <nav>
+                        {nav.map((item) => (
+                            <Link
+                                key={item.title}
+                                href={item.href}
+                                className='text-xl font-medium text-black transition-colors duration-300 hover:text-blue-600'
+                                onClick={() => setBurger(false)}
+                            >
+                                {item.title}
+                            </Link>
+                        ))}
+                    </nav>
+                </div>
+            )}
 
             <ModalAutch open={open} onClose={() => setOpen(false)} setOpen={setOpen} />
         </header>

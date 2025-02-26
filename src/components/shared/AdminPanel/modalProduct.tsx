@@ -153,7 +153,7 @@ export const ModalProduct: React.FC<Props> = ({ open, onClose, editProduct }) =>
 
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
         e.preventDefault();
-
+        console.log(id)
         const comf = confirm('Вы уверены, что хотите удалить товар?');
 
         if (!comf) {
